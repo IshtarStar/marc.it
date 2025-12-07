@@ -1,15 +1,11 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
     <main class="wrapper">
+        <div class="bg-typography" id="bg-words"></div>
         <div class="box">
-
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 507.64 117.51" class="logo">
                 <g>
                     <path class="st0"
@@ -85,11 +81,32 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-    // Führt den Code aus, sobald das DOM vollständig geladen ist
+    // Definition der Wörter
+    const buzzwords = [
+        "CLOUD ARCHITECTURE", "KUBERNETES", "MICROSERVICES", "AWS", "AZURE",
+        "DEVOPS", "SCALABILITY", "SECURITY", "DIGITAL TRANSFORMATION",
+        "HIGH PERFORMANCE", "SAAS", "IAAS", "SERVERLESS", "MODERN WEB"
+    ];
+
+    // Fisher-Yates Shuffle Algorithmus für echte Zufälligkeit
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        // Prüft, ob die Bildschirmbreite kleiner oder gleich 768px ist (typisch für Mobile/Tablets)
+        // 1. Wörter mischen und einfügen
+        const container = document.getElementById('bg-words');
+        if (container) {
+            const shuffled = shuffleArray([...buzzwords]); // Kopie erstellen und mischen
+            container.innerHTML = shuffled.map(word => `<span>${word}</span>`).join('');
+        }
+
+        // 2. Scroll-Logik für Mobile
         if (window.innerWidth <= 768) {
-            // Scrollt sanft zum unteren Ende der Seite
             window.scrollTo({
                 top: document.body.scrollHeight,
                 behavior: 'smooth'
@@ -97,7 +114,6 @@ import Layout from '../layouts/Layout.astro';
         }
     });
 </script>
-
 
 <style is:global>
     body {
@@ -127,19 +143,63 @@ import Layout from '../layouts/Layout.astro';
         align-items: center;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         position: relative;
+        overflow: hidden;
     }
 
-	.box {
-		border: 1px solid #364e63;
-		border-radius: 40px;
-		padding: 70px 100px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		width: fit-content;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-	}
+    /* Neue Styles für die Hintergrund-Typografie */
+    .bg-typography {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0; /* Ganz hinten */
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 20px;
+        pointer-events: none; /* Damit man nicht draufklicken kann */
+        user-select: none;
+    }
+
+    /* WICHTIG: :global() verwenden, da die spans per JS kommen */
+    .bg-typography :global(span) {
+        font-size: 7vw; /* Riesige Schrift */
+        font-weight: 900;
+        line-height: 0.9;
+        text-transform: uppercase;
+    }
+
+    /* Jedes Wort abwechselnd einfärben */
+    .bg-typography :global(span:nth-child(odd)) {
+        color: rgba(129, 187, 39, 0.03); /* Dein Grün, sehr transparent */
+        -webkit-text-stroke: 1px rgba(129, 187, 39, 0.1);
+    }
+
+    .bg-typography :global(span:nth-child(even)) {
+        color: rgba(224, 230, 237, 0.03); /* Dein Weiß, sehr transparent */
+        -webkit-text-stroke: 1px rgba(224, 230, 237, 0.1);
+    }
+
+    .box {
+        border: 2px solid rgba(54, 78, 99, 0.5); /* Etwas transparenter Rand */
+        border-radius: 40px;
+        padding: 70px 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: fit-content;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+
+        /* Der Blur-Effekt (Glassmorphism) */
+        background-color: rgba(14, 29, 42, 0.65); /* Halbtransparenter Hintergrund */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px); /* Für Safari */
+        z-index: 1; /* Vor dem Hintergrund */
+    }
 
     .logo {
         margin-bottom: 40px;
@@ -223,6 +283,7 @@ import Layout from '../layouts/Layout.astro';
         bottom: 40px;
         display: flex;
         gap: 30px;
+        z-index: 2;
     }
 
     .social-links a {
