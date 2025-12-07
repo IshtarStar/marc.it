@@ -23,10 +23,9 @@ jobs:
       - name: deploy file to server
         uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
-          username: 'github'
-          password: '${{ secrets.PASSWORD }}'
-          server: '${{ secrets.SERVER_IP }}'
+          username: 'deploy'
+          server: ${{ secrets.SERVER_IP }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           local_path: './dist/*'
-          remote_path: '/srv/pages/marc.it/www'
+          remote_path: '/var/www/marc.it'
           sftpArgs: '-o ConnectTimeout=5'
-          ssh_private_key: ''
