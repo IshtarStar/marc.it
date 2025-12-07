@@ -1,0 +1,26 @@
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    name: build&deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: npm run build
+
+      - name: deploy file to server
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+        with:
+          username: 'github'
+          password: '${{ secrets.PASSWORD }}'
+          server: '${{ secrets.SERVER_IP }}'
+          local_path: './dist/*'
+          remote_path: '/srv/pages/marc.it/www'
+          sftpArgs: '-o ConnectTimeout=5'
+          ssh_private_key: ''
