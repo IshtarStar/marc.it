@@ -64,7 +64,8 @@ import Layout from '../layouts/Layout.astro';
 					<a href="mailto:contact@marc.it">contact@marc.it</a><br>
 					<span class="tax-id">USt-ID: DE342907468</span>
 				</address>
-			</div>
+                <a href="/blog" class="blog-link">Visit our Blog &rarr;</a>
+            </div>
 		</div>
         <div class="social-links">
             <a href="https://www.linkedin.com/in/marc-wolf-b7808825/" target="_blank" aria-label="LinkedIn">
@@ -179,6 +180,28 @@ import Layout from '../layouts/Layout.astro';
 		font-size: 0.9em;
 		opacity: 0.8;
 	}
+
+    .blog-link {
+        margin-top: 30px;
+        display: inline-block;
+        color: #81bb27; /* Farbe aus deinem Logo */
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1.1rem;
+        border: 1px solid #81bb27;
+        padding: 10px 20px;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .blog-link:hover {
+        background-color: #81bb27;
+        color: #0e1d2a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(129, 187, 39, 0.2);
+    }
 
     .social-links {
         position: absolute;
