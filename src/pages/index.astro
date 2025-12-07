@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import marcImage from '../assets/marc_wolf.jpg';
 ---
 
 <Layout>
@@ -52,15 +53,22 @@ import Layout from '../layouts/Layout.astro';
             </svg>
 			<div class="content">
 				<h2>We will be back soon!</h2>
-				<address>
-                    <strong>Marc Wolf</strong><br>
-					Rehleite 1<br>
-					D-95326 Kulmbach<br>
-					<a href="tel:+4915735426512">+49 1573 54 26 512</a><br>
-					<a href="mailto:contact@marc.it">contact@marc.it</a><br>
-					<span class="tax-id">USt-ID: DE342907468</span>
-				</address>
-                <a href="/blog" class="blog-link">Visit our Blog &rarr;</a>
+                <div class="contact-wrapper">
+                    <div class="avatar">
+                        <img src={marcImage.src} alt="Marc Wolf" />
+                    </div>
+                    <div class="address-block">
+                        <address>
+                            <strong class="owner">Marc Wolf</strong><br>
+                            Rehleite 1<br>
+                            D-95326 Kulmbach<br>
+                            <a href="tel:+4915735426512">+49 1573 54 26 512</a><br>
+                            <a href="mailto:contact@marc.it">contact@marc.it</a><br>
+                            <span class="tax-id">USt-ID: DE342907468</span>
+                        </address>
+                        <a href="/blog" class="blog-link">Visit our Blog &rarr;</a>
+                    </div>
+                </div>
             </div>
 		</div>
         <div class="social-links">
@@ -81,36 +89,84 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-    // Definition der Wörter
-    const buzzwords = [
-        "CLOUD ARCHITECTURE", "KUBERNETES", "MICROSERVICES", "AWS", "AZURE",
-        "DEVOPS", "SCALABILITY", "SECURITY", "DIGITAL TRANSFORMATION",
-        "HIGH PERFORMANCE", "SAAS", "IAAS", "SERVERLESS", "MODERN WEB"
-    ];
+    // Wörterbuch gruppiert nach Länge (Anzahl Zeichen)
+    // Jede Länge hat mindestens 4 Einträge für Varianz
+    const wordPool = {
+        3: ["AWS", "API", "SQL", "GIT", "CLI", "SPA", "SSR", "TDD", "BDD", "DDD"],
+        4: ["CODE", "DATA", "REST", "JSON", "NODE", "SAAS", "IAAS", "PAAS", "GRPC", "ACES"],
+        5: ["CLOUD", "AZURE", "LINUX", "REDIS", "KAFKA", "AGILE", "SCRUM", "SOLID", "STACK", "LOGIC"],
+        6: ["DOCKER", "DEVOPS", "PYTHON", "GOLANG", "SERVER", "CLIENT", "DESIGN", "CODING", "CONFIG", "DEPLOY"],
+        7: ["ANSIBLE", "JENKINS", "GRAFANA", "NETWORK", "STORAGE", "TESTING", "CLUSTER", "MODULES", "SCALER", "VAGRANT"],
+        8: ["SECURITY", "FRONTEND", "BACKEND", "DATABASE", "PLATFORM", "REFACTOR", "STRATEGY", "PIPELINE", "WORKFLOW", "SOLUTION"],
+        9: ["SERVERLESS", "TERRAFORM", "CONTAINER", "FRAMEWORK", "ANALYTICS", "INTERFACE", "WEBSOCKET", "DEBUGGING", "DATABASES", "SOLUTIONS"],
+        10: ["KUBERNETES", "TYPESCRIPT", "JAVASCRIPT", "FULLSTACK", "DEPLOYMENT", "COMPONENTS", "MONITORING", "AUTOMATION", "MIDDLEWARE", "CONTROLLER"],
+        11: ["SCALABILITY", "PERFORMANCE", "OPENSOURCE", "REPOSITORY", "INTEGRATION", "DEVELOPMENT", "REFACTORING", "ENGINEERING", "PROGRAMMING", "APPLICATION"],
+        12: ["MICROSERVICE", "ARCHITECTURE", "OPTIMIZATION", "ORCHESTRATION", "VIRTUALIZES", "PROVISIONING", "CONNECTIVITY", "NOTIFICATION", "INSTALLATION", "WORKSTATIONS"],
+        13: ["OBSERVABILITY", "CONFIGURATION", "VIRTUALIZATION", "DOCUMENTATION", "SPECIFICATION", "COMMUNICATION", "AUTHORIZATION", "CERTIFICATION", "VISUALIZATION", "COMPATIBILITY"],
+        14: ["TRANSFORMATION", "INFRASTRUCTURE", "IMPLEMENTATION", "AUTHENTICATION", "INITIALIZATION", "ADMINISTRATION", "REPRESENTATION", "RECOMMENDATION", "TRANSPORTATION", "IDENTIFICATION"]
+    };
 
-    // Fisher-Yates Shuffle Algorithmus für echte Zufälligkeit
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
+    function getRandomWordFromPool() {
+        // Hilfsfunktion, um zufällig ein Wort aus dem gesamten Pool zu holen (für initiales Rendering)
+        const lengths = Object.keys(wordPool);
+        const randomLength = lengths[Math.floor(Math.random() * lengths.length)];
+        const words = wordPool[randomLength];
+        return words[Math.floor(Math.random() * words.length)];
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Wörter mischen und einfügen
         const container = document.getElementById('bg-words');
+
         if (container) {
-            const shuffled = shuffleArray([...buzzwords]); // Kopie erstellen und mischen
-            container.innerHTML = shuffled.map(word => `<span>${word}</span>`).join('');
+            // Initiales Füllen: Wir erzeugen viele zufällige Wörter
+            // Wir nehmen ca. 50 Wörter, das sollte für die meisten Screens reichen
+            const initialWords = [];
+            for (let i = 0; i < 60; i++) {
+                initialWords.push(getRandomWordFromPool());
+            }
+
+            container.innerHTML = initialWords.map(word => `<span>${word}</span>`).join(' ');
+
+            const spans = Array.from(container.querySelectorAll('span'));
+
+            // Animation Loop
+            setInterval(() => {
+                // Wähle zufälliges Span
+                const span = spans[Math.floor(Math.random() * spans.length)];
+
+                // 1. Ausblenden
+                span.style.opacity = '0';
+
+                // 2. Warten bis ausgeblendet, dann tauschen
+                setTimeout(() => {
+                    const currentWord = span.innerText;
+                    const len = currentWord.length;
+
+                    // Hole Liste für diese Länge
+                    // Fallback auf Länge 4, falls irgendwas schief geht (sollte nicht passieren)
+                    const options = wordPool[len] || wordPool[4];
+
+                    // Wähle ein NEUES Wort (versuche das gleiche zu vermeiden)
+                    let newWord = options[Math.floor(Math.random() * options.length)];
+                    let attempts = 0;
+                    while (newWord === currentWord && attempts < 5) {
+                        newWord = options[Math.floor(Math.random() * options.length)];
+                        attempts++;
+                    }
+
+                    span.innerText = newWord;
+
+                    // 3. Einblenden (style attribut entfernen, damit CSS greift)
+                    span.style.opacity = '';
+
+                }, 2000); // Wartezeit muss zur CSS transition passen (2s)
+
+            }, 400); // Alle 400ms wird ein Tausch angestoßen
         }
 
-        // 2. Scroll-Logik für Mobile
+        // Mobile Scroll logic
         if (window.innerWidth <= 768) {
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
     });
 </script>
@@ -126,13 +182,8 @@ import Layout from '../layouts/Layout.astro';
     html {
         background-color: #0e1d2a;
     }
-    .st0 {
-        fill: #81bb27;
-    }
-
-    .st1 {
-        fill: #fff;
-    }
+    .st0 { fill: #81bb27; }
+    .st1 { fill: #fff; }
 
     .wrapper {
         background-color: #0e1d2a;
@@ -146,45 +197,53 @@ import Layout from '../layouts/Layout.astro';
         overflow: hidden;
     }
 
-    /* Neue Styles für die Hintergrund-Typografie */
     .bg-typography {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 0; /* Ganz hinten */
-        display: flex;
-        flex-wrap: wrap;
-        align-content: center;
-        justify-content: center;
-        gap: 1rem;
+        z-index: 0;
+        display: block;
+        text-align: center;
         padding: 20px;
-        pointer-events: none; /* Damit man nicht draufklicken kann */
+        pointer-events: none;
         user-select: none;
+        box-sizing: border-box;
+        line-height: 0.85;
+        overflow: hidden;
     }
 
-    /* WICHTIG: :global() verwenden, da die spans per JS kommen */
     .bg-typography :global(span) {
-        font-size: 7vw; /* Riesige Schrift */
+        font-size: 7vw;
         font-weight: 900;
-        line-height: 0.9;
         text-transform: uppercase;
+        display: inline;
+        background-color: transparent;
+
+        /* Initial sichtbar (durch CSS Rules unten) */
+        opacity: 0.04;
+
+        /* Sanfte Transition für opacity */
+        transition: opacity 2s ease-in-out;
+
+        margin: 0 0.25em;
     }
 
-    /* Jedes Wort abwechselnd einfärben */
+    /* Farben festlegen */
     .bg-typography :global(span:nth-child(odd)) {
-        color: rgba(129, 187, 39, 0.03); /* Dein Grün, sehr transparent */
-        -webkit-text-stroke: 1px rgba(129, 187, 39, 0.1);
+        color: #81bb27;
+        -webkit-text-stroke: 1px #81bb27;
     }
 
     .bg-typography :global(span:nth-child(even)) {
-        color: rgba(224, 230, 237, 0.03); /* Dein Weiß, sehr transparent */
-        -webkit-text-stroke: 1px rgba(224, 230, 237, 0.1);
+        color: #e0e6ed;
+        -webkit-text-stroke: 1px #e0e6ed;
     }
 
+    /* ... box, logo, content styles ... */
     .box {
-        border: 2px solid rgba(54, 78, 99, 0.5); /* Etwas transparenter Rand */
+        border: 2px solid rgba(54, 78, 99, 0.5);
         border-radius: 40px;
         padding: 70px 100px;
         display: flex;
@@ -193,19 +252,17 @@ import Layout from '../layouts/Layout.astro';
         text-align: center;
         width: fit-content;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-
-        /* Der Blur-Effekt (Glassmorphism) */
-        background-color: rgba(14, 29, 42, 0.65); /* Halbtransparenter Hintergrund */
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px); /* Für Safari */
-        z-index: 1; /* Vor dem Hintergrund */
+        background-color: rgba(14, 29, 42, 0.65);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 1;
     }
 
     .logo {
         margin-bottom: 40px;
         width: 20vw;
         height: auto;
-        min-width: 250px; /* Damit es auf Handys nicht zu klein wird */
+        min-width: 250px;
     }
 
     .content {
@@ -215,51 +272,93 @@ import Layout from '../layouts/Layout.astro';
         align-items: center;
     }
 
-	.content h2 {
-		color: #e0e6ed;
-		font-weight: 300;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		margin: 10px 0 50px 0;
-		font-size: 2.2rem;
-		width: 100%;
-	}
+    .content h2 {
+        color: #e0e6ed;
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 10px 0 40px 0;
+        font-size: 2.2rem;
+        width: 100%;
+    }
 
-	address {
-		font-style: normal;
-		color: #a0b3c6;
-		line-height: 1.6;
-		font-weight: 300;
-		text-align: left;
+    /* Neuer Wrapper für Bild + Adresse */
+    .contact-wrapper {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(129, 187, 39, 0.3);
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center; /* Zentriert horizontal */
+        align-items: flex-start; /* Bild klebt am oberen Rand */
+        transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+        transform: translateY(-4px);
+        border-color: rgba(129, 187, 39, 0.8);
+    }
+
+    .avatar img {
+        width: 125%;
+        height: 125%;
+        object-fit: cover;
+        object-position: top center; /* Sicherstellen, dass auch intern das Bild oben ansetzt */
+    }
+
+    .address-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    address {
+        font-style: normal;
+        color: #a0b3c6;
+        line-height: 1.6;
+        font-weight: 300;
+        text-align: left;
         width: fit-content;
     }
 
-	address a {
-		color: #a0b3c6;
-		text-decoration: none;
-		display: inline-block;
-		margin-top: 2px;
-	}
-
-	address a:hover {
-		color: #fff;
-	}
-
-    address strong {
-    	font-weight: bold;
+    address a {
+        color: #a0b3c6;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 2px;
     }
 
-	.tax-id {
-		display: block;
-		margin-top: 5px;
-		font-size: 0.9em;
-		opacity: 0.8;
-	}
+    address a:hover {
+        color: rgba(129, 187, 39);
+    }
+
+    address strong {;
+        font-weight: 700;
+    }
+
+    address .owner {
+        font-size: 1.1rem;
+    }
+
+    .tax-id {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
 
     .blog-link {
-        margin-top: 30px;
+        margin-top: 20px;
         display: inline-block;
-        color: #81bb27; /* Farbe aus deinem Logo */
+        color: #81bb27;
         text-decoration: none;
         font-weight: 500;
         font-size: 1.1rem;
@@ -305,7 +404,6 @@ import Layout from '../layouts/Layout.astro';
         fill: currentColor;
     }
 
-
     @media (max-width: 768px) {
         .box {
             margin: 0 10px;
@@ -313,12 +411,41 @@ import Layout from '../layouts/Layout.astro';
         }
 
         .content h2 {
-        	font-size: 1.4rem;
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+        }
+
+        /* Auf Mobile untereinander stapeln */
+        .contact-wrapper {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .address-block {
+            align-items: center;
+        }
+
+        address {
+            text-align: center;
         }
 
         .social-links {
             bottom: 30px;
             gap: 20px;
+        }
+
+        .bg-typography {
+            padding: 10px;
+            text-align: justify;
+        }
+
+        .bg-typography :global(span) {
+            font-size: 15vw;
+            line-height: 0.85;
+            width: auto;
+            margin: 0 0.1em;
         }
     }
 </style>
