@@ -84,6 +84,21 @@ import Layout from '../layouts/Layout.astro';
     </div>
 </Layout>
 
+<script>
+    // Führt den Code aus, sobald das DOM vollständig geladen ist
+    document.addEventListener('DOMContentLoaded', () => {
+        // Prüft, ob die Bildschirmbreite kleiner oder gleich 768px ist (typisch für Mobile/Tablets)
+        if (window.innerWidth <= 768) {
+            // Scrollt sanft zum unteren Ende der Seite
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    });
+</script>
+
+
 <style is:global>
     body {
         margin: 0;
